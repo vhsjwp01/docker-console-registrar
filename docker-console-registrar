@@ -14,6 +14,16 @@ SUCCESS=0
 ERROR=1
 
 DOCKER_CONSOLE_REGISTRAR_PORT=42001
+STDOUT_OFFSET="    "
+
+SCRIPT_NAME="${0}"
+
+USAGE_ENDLINE="\n${STDOUT_OFFSET}${STDOUT_OFFSET}${STDOUT_OFFSET}${STDOUT_OFFSET}"
+USAGE="${SCRIPT_NAME}${USAGE_ENDLINE}"
+USAGE="${USAGE}[ --host <valid host or IPv4 address> ]${USAGE_ENDLINE}"
+USAGE="${USAGE}[ --username <the username to use for authentication> ]${USAGE_ENDLINE}"
+USAGE="${USAGE}[ --password <the password to use for authentication> ]${USAGE_ENDLINE}"
+USAGE="${USAGE}[ --containerid <the associated docker container> ]${USAGE_ENDLINE}"
 
 ################################################################################
 # VARIABLES
@@ -157,3 +167,21 @@ if [ ${exit_code} -eq ${SUCCESS} ]; then
     auth_hash=`echo "${username}:${password}" | ${my_md5_command} | ${my_awk} '{print $1}'`
     echo "${auth_hash}:${containerid}" | ${my_nc} ${host} ${DOCKER_CONSOLE_REGISTRAR_PORT}
 fi
+
+# WHAT: Complain if necessary and exit
+# WHY:  Success or failure, either way we are through
+#
+if [ ${exit_code} -ne ${SUCCESS} ]; then
+
+    if [ "${err_msg}" != "" ]; then
+        echo -ne "\n\n"
+        echo -ne "${STDOUT_OFFSET}ERROR:  ${err_msg} ... processing halted\n"
+        echo
+    fi
+
+    echo
+    echo -ne "${STDOUT_OFFSET}USAGE:  ${USAGE}\n"
+    echo
+fi
+
+exit ${exit_code}
