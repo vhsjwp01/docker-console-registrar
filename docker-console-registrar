@@ -160,6 +160,20 @@ if [ ${exit_code} -eq ${SUCCESS} ]; then
 
 fi
 
+# WHAT: Sanitize ${username} and ${password}
+# WHY:  Cannot continue otherwise
+#
+if [ ${exit_code} -eq ${SUCCESS} ]; then
+    sanitized_username=`echo "${username}" | sed -e 's?[^a-zA-Z0-9]??g'`
+    sanitized_password=`echo "${password}" | sed -e 's?[^a-zA-Z0-9]??g'`
+
+    if [ "${sanitized_username}" != "${username}" -o "${sanitized_password}" != "${password}" ]; then
+        err_msg="Only the following characters can be used in the username or password: a-z, A-Z, 0-9"
+        exit_code=${ERROR}
+    fi
+
+fi
+
 # WHAT: Try to connect to the remote docker console manager of the provided host
 # WHY:  The reason we are here
 #
