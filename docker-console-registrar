@@ -18,6 +18,9 @@ STDOUT_OFFSET="    "
 
 SCRIPT_NAME="${0}"
 
+# netcat default timeout in seconds
+TIMEOUT="28800"
+
 USAGE_ENDLINE="\n${STDOUT_OFFSET}${STDOUT_OFFSET}${STDOUT_OFFSET}${STDOUT_OFFSET}"
 USAGE="${SCRIPT_NAME}${USAGE_ENDLINE}"
 USAGE="${USAGE}[ --host <valid host or IPv4 address> ]${USAGE_ENDLINE}"
@@ -179,7 +182,7 @@ fi
 #
 if [ ${exit_code} -eq ${SUCCESS} ]; then
     auth_hash=`echo "${username}:${password}" | ${my_md5_command} | ${my_awk} '{print $1}'`
-    echo "${auth_hash}:${containerid}" | ${my_nc} ${host} ${DOCKER_CONSOLE_REGISTRAR_PORT}
+    echo "${auth_hash}:${containerid}" | ${my_nc} -w ${TIMEOUT} ${host} ${DOCKER_CONSOLE_REGISTRAR_PORT}
 fi
 
 # WHAT: Complain if necessary and exit
