@@ -182,7 +182,16 @@ fi
 #
 if [ ${exit_code} -eq ${SUCCESS} ]; then
     auth_hash=`echo "${username}:${password}" | ${my_md5_command} | ${my_awk} '{print $1}'`
-    echo "${auth_hash}:${containerid}" | ${my_nc} -w ${TIMEOUT} ${host} ${DOCKER_CONSOLE_REGISTRAR_PORT}
+
+    # See if netcat requires units for timeout:
+    let timeout_unit_check=$(${my_nc} -w ${TIMEOUT}s 2>&1 | egrep -c "timeout cannot be negative")
+
+    if [ ${timeout_unit_check} -eq 0 ]; then
+        echo "${auth_hash}:${containerid}" | ${my_nc} -w ${TIMEOUT}s ${host} ${DOCKER_CONSOLE_REGISTRAR_PORT}
+    else
+        echo "${auth_hash}:${containerid}" | ${my_nc} -w ${TIMEOUT} ${host} ${DOCKER_CONSOLE_REGISTRAR_PORT}
+    fi
+
 fi
 
 # WHAT: Complain if necessary and exit
